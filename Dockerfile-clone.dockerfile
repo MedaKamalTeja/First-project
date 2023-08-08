@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk update && apk add git
 
 # Clone the repository
-RUN git clone https://github.com/Pavan1831/FirstGitProject.git
+RUN git clone https://github.com/MedaKamalTeja/First-project.git
 
 # Set the working directory within the cloned repository
 WORKDIR /app/FirstGitProject
