@@ -11,7 +11,7 @@ RUN apk update && apk add git
 RUN git clone https://github.com/MedaKamalTeja/First-project.git
 
 # Set the working directory within the cloned repository
-WORKDIR /app/FirstGitProject
+WORKDIR /app/FirstProject
 
 # Run the app.js file
 CMD node app.js
