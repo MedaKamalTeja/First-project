@@ -1,41 +1,46 @@
 pipeline {
-    agent any
-
+    agent any 
     environment {
-        DOCKER_REGISTRY = "https://docker.io"
-        IMAGE_NAME = "jddemo"
-        IMAGE_TAG = "latest"
+        registry = "kamalteja99/mypythonapp"
+        //- update your credentials ID after creating credentials for connecting to Docker Hub
+        registryCredential = "dd54db5b-46b5-485a-a2ed-66ca72e57689"
+        dockerImage = ''
     }
-
+    
     stages {
-        stage('Build Docker Image') {
+        stage('Cloning Git') {
             steps {
-                script {
-                    // Build the Docker image using the Dockerfile in the current directory
-                    dockerImage = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
+            checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/MedaKamalTeja/First-project.git']])            }
         }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    // Log in to the Docker registry
-                    docker.withRegistry("${DOCKER_REGISTRY}", "docker-credentials-id") {
-                        // Push the built Docker image to the registry
-                        dockerImage.push("${IMAGE_TAG}")
-                    }
-                }
-            }
+    
+    // Building Docker images
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry
         }
-
-        stage('Run Docker Image') {
-            steps {
-                script {
-                    // Run the Docker image
-                    docker.run("--rm -p 8080:80 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
-        }
+      }
     }
+    
+     // Uploading Docker images into Docker Hub
+    stage('Upload Image') {
+     steps{    
+         script {
+            docker.withRegistry( '', registryCredential ) {
+            dockerImage.push()
+            }
+        }
+      }
+    }
+    
+    
+    // Running Docker container, make sure port 8096 is opened in 
+    stage('Docker Run') {
+     steps{
+         script {
+            bat "docker run %registry%"
+         }
+      }
+    }
+  }
 }
